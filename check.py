@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import sys
+import json
+import re
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -51,6 +53,15 @@ def check() -> None:
         lang = "en" if rel.startswith("en/") else "id"
         assert page.h1 == 1, f"one H1 required: {file}"
         assert page.jsonld, f"missing JSON-LD: {file}"
+        match = re.search(r"<script type='application/ld\+json'>(.*?)</script>", raw)
+        assert match, f"missing structured data: {file}"
+        schema = json.loads(match.group(1))
+        assert schema["url"] == url and schema["inLanguage"] == lang
+        assert schema["@type"] != "Product", f"unsupported product claim: {file}"
+        if "panduan/" in rel:
+            assert schema["@type"] == "Article" and schema["headline"] == schema["name"]
+        if "alat/" in rel:
+            assert schema["@type"] == "WebApplication" and schema["applicationCategory"] == "UtilityApplication"
         assert f"<html lang='{lang}'>" in raw
         assert f"<link rel='canonical' href='{url}'>" in raw
         assert raw.count("hreflang=") == 3
