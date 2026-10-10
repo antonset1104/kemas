@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kemas.vijeron.com/sitemap.xml
