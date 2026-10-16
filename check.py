@@ -66,8 +66,9 @@ def check() -> None:
         assert f"<link rel='canonical' href='{url}'>" in raw
         assert raw.count("hreflang=") == 3
         assert "<meta name='description'" in raw
-        if "privasi/" in rel:
+        if any(section in rel for section in ("privasi/", "tentang/", "metode/")):
             assert "pagead2.googlesyndication.com" not in raw
+            assert "vijeron-ads.js" not in raw
         else:
             assert "ca-pub-6180580801533680" in raw
             assert raw.index("gtag('consent','default'") < raw.index("gtag('config'")

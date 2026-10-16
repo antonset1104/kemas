@@ -1,5 +1,7 @@
 """Generate the independent Kemas Terukur static site."""
 from __future__ import annotations
+
+ADS_LOADER = '<script defer src="https://vijeron.com/assets/vijeron-ads.js"></script>'
 import html
 import json
 import shutil
@@ -34,7 +36,7 @@ def head(lang, suffix, title, desc, kind="WebPage", ads=True):
     elif kind == "WebApplication":
         schema.update({"applicationCategory": "UtilityApplication", "operatingSystem": "Web"})
     scripts = ("<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});</script><script async src='https://fundingchoicesmessages.google.com/i/pub-6180580801533680?ers=1'></script><script async src='https://www.googletagmanager.com/gtag/js?id=G-79X7K7H4MJ'></script><script>gtag('js',new Date());gtag('config','G-79X7K7H4MJ');</script><script async crossorigin='anonymous' src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6180580801533680'></script>") if ads else ""
-    return (f"<!doctype html><html lang='{lang}'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>{e(title)} | Vijeron</title><meta name='description' content='{e(desc)}'><meta name='theme-color' content='#173c48'><link rel='canonical' href='{e(url)}'>{alt}<link rel='icon' type='image/svg+xml' href='/assets/icon.svg'><link rel='stylesheet' href='/assets/site.css'><meta property='og:type' content='{'article' if kind=='Article' else 'website'}'><meta property='og:title' content='{e(title)}'><meta property='og:description' content='{e(desc)}'><meta property='og:url' content='{e(url)}'><script type='application/ld+json'>{json.dumps(schema,ensure_ascii=False).replace('<','\\u003c')}</script>{scripts}<script defer src=https://vijeron.com/assets/vijeron-ads.js></script></head><body>")
+    return (f"<!doctype html><html lang='{lang}'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>{e(title)} | Vijeron</title><meta name='description' content='{e(desc)}'><meta name='theme-color' content='#173c48'><link rel='canonical' href='{e(url)}'>{alt}<link rel='icon' type='image/svg+xml' href='/assets/icon.svg'><link rel='stylesheet' href='/assets/site.css'><meta property='og:type' content='{'article' if kind=='Article' else 'website'}'><meta property='og:title' content='{e(title)}'><meta property='og:description' content='{e(desc)}'><meta property='og:url' content='{e(url)}'><script type='application/ld+json'>{json.dumps(schema,ensure_ascii=False).replace('<','\\u003c')}</script>{scripts}{ADS_LOADER if ads else ''}</head><body>")
 
 def chrome(lang,suffix):
     t=T[lang]; other="en" if lang=="id" else "id"
@@ -81,7 +83,7 @@ def info(lang,kind):
     blocks="".join(f"<section class='prose-section'><h2>{e(h)}</h2><p>{e(p)}</p></section>" for h,p in sections)
     source_html=f"<section class='references'><h2>{e(t['refs'])}</h2>{refs(list(SOURCES))}</section>" if kind=="metode" else ""
     body=f"<main id='main' class='wrap info-page'><nav class='crumb'><a href='{path(lang)}'>{e(t['home'])}</a> / {e(title)}</nav><p class='eyebrow'>VIJERON / PACKING DESK</p><h1>{e(title)}</h1><p class='lead'>{e(desc)}</p><div class='prose'>{blocks}{source_html}</div></main>"
-    write(path(lang,suffix)+"index.html",head(lang,suffix,title,desc,ads=kind!="privasi")+chrome(lang,suffix)+body+foot(lang));record(lang,suffix)
+    write(path(lang,suffix)+"index.html",head(lang,suffix,title,desc,ads=False)+chrome(lang,suffix)+body+foot(lang));record(lang,suffix)
 
 def main():
     if OUT.exists(): shutil.rmtree(OUT)
